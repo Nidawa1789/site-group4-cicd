@@ -1,5 +1,7 @@
+# Ce workflow déploie le site web vers un bucket AWS S3
 name: Deploy Website to S3
 
+# Déclenche le workflow lors d'un push sur la branche main
 on:
   push:
     branches:
@@ -7,11 +9,14 @@ on:
 
 jobs:
   deploy:
+    # Utilise Ubuntu comme environnement d'exécution
     runs-on: ubuntu-latest
     steps:
+      # Étape 1: Récupère le dernier code du dépôt
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      # Étape 2: Configure les identifiants AWS pour l'accès à S3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -19,6 +24,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Étape 3: Télécharge tous les fichiers vers le bucket S3 et supprime les fichiers qui n'existent pas localement
       - name: Sync website files to S3 bucket
         run: |
           aws s3 sync . s3://${{ secrets.AWS_S3_BUCKET }} --delete
